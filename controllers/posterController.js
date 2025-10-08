@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const multer = require('multer');
-const { gdriveCredFilename, gdriveRoot } = require('../config');
+const { gdriveCreds, gdriveRoot } = require('../config');
 const Interview = require('../models/interviewModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
@@ -24,7 +24,7 @@ const upload = multer({
   storage: multerStorage,
 });
 
-const drive = new Drive(path.join(__dirname, `../${gdriveCredFilename}`));
+const drive = new Drive(gdriveCreds);
 
 exports.uploadUserPhoto = upload.single('photo');
 

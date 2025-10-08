@@ -3,17 +3,17 @@ const { auth, drive } = require('@googleapis/drive');
 class Drive {
   /**
    *
-   * @param {String} keyFilename Path to the credentials file
+   * @param {Object} credentials The credentials object
    * @param {[String]} scopes Scopes to be used by the drive service. default: ['https://www.googleapis.com/auth/drive']
    *
    * This class is used to interact with the Google Drive API. It uses service accounts for authentication.
    *
-   * @example const testDrive = new Drive(path.join(__dirname, 'drive-creds.json'), ['https://www.googleapis.com/auth/drive']);
+   * @example const testDrive = new Drive(credentials, ['https://www.googleapis.com/auth/drive']);
    */
 
-  constructor(keyFilename, scopes = ['https://www.googleapis.com/auth/drive']) {
+  constructor(credentials, scopes = ['https://www.googleapis.com/auth/drive']) {
     this.auth = new auth.GoogleAuth({
-      keyFilename,
+      credentials,
       scopes,
     });
 
