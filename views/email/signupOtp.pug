@@ -1,0 +1,12 @@
+extends baseEmail
+
+block content
+  p Hi #{firstName},
+  p Please use the verification code below to sign in.
+
+  strong.otp #{token}
+  |
+  p If you didn't request this, please ignore this email!
+
+  p Thanks,
+  p - Team MRP

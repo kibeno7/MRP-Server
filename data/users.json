@@ -1,0 +1,185 @@
+[
+  {
+    "name": "Rishav Raj",
+    "reg_no": "2023pgcsca092",
+    "batch": "2023",
+    "role": "admin",
+    "email": "rishavr920@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Priyanshu Kumar",
+    "reg_no": "2023pgcaca029",
+    "batch": "2023",
+    "role": "admin",
+    "email": "priyanshu@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Vishal Kumar",
+    "reg_no": "2022pgcaca021",
+    "batch": "2022",
+    "role": "user",
+    "email": "vishal.bhojpuri@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Vivaan Verma",
+    "reg_no": "2022pgcaca002",
+    "batch": "2022",
+    "role": "user",
+    "email": "vivaan.verma@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Aditya Singh",
+    "reg_no": "2022pgcaca003",
+    "batch": "2022",
+    "role": "user",
+    "email": "aditya.singh@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Vihaan Gupta",
+    "reg_no": "2022pgcaca004",
+    "batch": "2022",
+    "role": "user",
+    "email": "vihaan.gupta@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Arjun Mehta",
+    "reg_no": "2022pgcaca005",
+    "batch": "2022",
+    "role": "admin",
+    "email": "arjun.mehta@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Sai Patel",
+    "reg_no": "2022pgcaca006",
+    "batch": "2022",
+    "role": "user",
+    "email": "sai.patel@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Reyansh Reddy",
+    "reg_no": "2022pgcaca007",
+    "batch": "2022",
+    "role": "user",
+    "email": "reyansh.reddy@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Ayaan Nair",
+    "reg_no": "2022pgcaca008",
+    "batch": "2022",
+    "role": "user",
+    "email": "ayaan.nair@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Krishna Rao",
+    "reg_no": "2022pgcaca009",
+    "batch": "2022",
+    "role": "admin",
+    "email": "krishna.rao@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Ishaan Desai",
+    "reg_no": "2022pgcaca010",
+    "batch": "2022",
+    "role": "user",
+    "email": "ishaan.desai@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Shaurya Iyer",
+    "reg_no": "2022pgcaca011",
+    "batch": "2022",
+    "role": "user",
+    "email": "shaurya.iyer@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Atharv Chatterjee",
+    "reg_no": "2022pgcaca012",
+    "batch": "2022",
+    "role": "user",
+    "email": "atharv.chatterjee@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Kabir Joshi",
+    "reg_no": "2022pgcaca013",
+    "batch": "2022",
+    "role": "user",
+    "email": "kabir.joshi@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Arnav Das",
+    "reg_no": "2022pgcaca014",
+    "batch": "2022",
+    "role": "user",
+    "email": "arnav.das@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Ansh Malhotra",
+    "reg_no": "2022pgcaca015",
+    "batch": "2022",
+    "role": "user",
+    "email": "ansh.malhotra@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Rudra Kapoor",
+    "reg_no": "2022pgcaca016",
+    "batch": "2022",
+    "role": "user",
+    "email": "rudra.kapoor@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Aarush Khan",
+    "reg_no": "2022pgcaca017",
+    "batch": "2022",
+    "role": "user",
+    "email": "aarush.khan@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Arnav Sharma",
+    "reg_no": "2022pgcaca018",
+    "batch": "2022",
+    "role": "user",
+    "email": "arnav.sharma@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Ayaan Singh",
+    "reg_no": "2022pgcaca019",
+    "batch": "2022",
+    "role": "user",
+    "email": "ayaan.singh@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "name": "Vivaan Gupta",
+    "reg_no": "2022pgcaca020",
+    "batch": "2022",
+    "role": "user",
+    "email": "vivaan.gupta@gmail.com",
+    "password": "12345678"
+  },{
+    "name": "Abhay Kumar Sharma",
+    "reg_no": "2023pgcaca033",
+    "batch": "2023",
+    "role": "admin",
+    "email": "abhaysharma7435@gmail.com",
+    "password": "12345678"
+  }
+]

@@ -1,0 +1,8 @@
+# server ignore
+uploads/*
+credentials/*
+temp/*
+!temp/*.md
+drive-credentials.json
+node_modules
+.envnode_modules
