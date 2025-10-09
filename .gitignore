@@ -5,4 +5,4 @@ temp/*
 !temp/*.md
 drive-credentials.json
 node_modules
-.envnode_modules
+.env

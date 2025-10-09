@@ -1,37 +1,131 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const { jwtSecret, jwtExpire, jwtCookieExpire, ssl } = require('../config');
+const { jwtSecret, jwtExpire, jwtCookieExpire } = require('../config');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const Email = require('../utils/email');
 
-const signToken = (id, role) =>
-  jwt.sign({ id, role }, jwtSecret, {
-    expiresIn: jwtExpire,
-  });
+// Reusable function to sign a token
+const signToken = (id, role) => jwt.sign({ id, role }, jwtSecret, { expiresIn: jwtExpire });
 
-const sendToken = (user, statusCode, res) => {
-  const token = signToken(user._id, user.role);
-
-  const cookieOptions = {
+// Centralized cookie options
+const getCookieOptions = (req) => {
+  return {
     expires: new Date(Date.now() + jwtCookieExpire * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    //hhtp only cookie needs to be sent through secure channel only, mandatorily if it is being done cross-site
+    // The 'secure' flag is crucial. It should be true in production (HTTPS)
+    // and is determined by checking the request's protocol.
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
     sameSite: 'None',
-    secure: ssl,
   };
+};
+
+// Reusable function to send the token in a cookie and as a JSON response
+const sendToken = (user, statusCode, req, res) => {
+  const token = signToken(user._id, user.role);
+  const cookieOptions = getCookieOptions(req);
 
   res.cookie('jwt', token, cookieOptions);
+
+  // Remove password from the output for security
+  user.password = undefined;
+
   res.status(statusCode).json({
     status: 'success',
     token,
     data: {
-      user: user,
+      user,
     },
   });
 };
+
+// User Login
+exports.login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new AppError('Please provide email and password', 400));
+  }
+
+  const user = await User.findOne({ email, active: { $ne: false } }).select('+password');
+
+  if (!user || !(await user.checkPassword(password, user.password))) {
+    return next(new AppError('Incorrect email or password', 401));
+  }
+
+  sendToken(user, 200, req, res);
+});
+
+// User Logout
+exports.logout = (req, res) => {
+  // To clear the cookie, we send a cookie with the same name but with an immediate expiration date.
+  const cookieOptions = getCookieOptions(req);
+  res.cookie('jwt', 'loggedout', {
+    ...cookieOptions,
+    expires: new Date(Date.now() + 5 * 1000), // Expires in 5 seconds
+  });
+  res.status(200).json({ status: 'success' });
+};
+
+// Middleware to protect routes
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token || token === 'loggedout') {
+    return next(new AppError('Please log in to get access.', 401));
+  }
+
+  // 1) Verify token
+  const decoded = await promisify(jwt.verify)(token, jwtSecret);
+
+  // 2) Check if user still exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(new AppError('The user belonging to this token does no longer exist.', 401));
+  }
+
+  // 3) Check if user changed password after the token was issued
+  if (currentUser.isPasswordChangedAfter(decoded.iat)) {
+    return next(new AppError('User recently changed password! Please log in again.', 401));
+  }
+
+  // Grant access
+  req.user = currentUser;
+  next();
+});
+
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  console.log('Method invoked');
+  console.log(req.cookies.jwt);
+    if (req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
+        const decoded = await promisify(jwt.verify)(req.cookies.jwt, jwtSecret);
+        const currentUser = await User.findById(decoded.id);
+        if (!currentUser || !currentUser.active) {
+            return res.status(200).json({ status: 'fail', data: { user: null } });
+        }
+
+        if (currentUser.isPasswordChangedAfter(decoded.iat)) {
+            return res.status(200).json({ status: 'fail', data: { user: null } });
+        }
+        return res.status(200).json({
+            status: 'success',
+            data: {
+                user: currentUser,
+            },
+        });
+    }
+
+    // No token found
+    res.status(200).json({ status: 'fail', data: { user: null } });
+});
+
+
+
 
 exports.signup = catchAsync(async (req, res, next) => {
   const user = await User.findOne({
@@ -71,138 +165,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
-
-  //1. Check if email and password not null
-  if (!email || !password) {
-    throw new AppError('Please provide email and password', 400);
-  }
-
-  //2. Check if user exist
-  const user = await User.findOne({ email, active: { $ne: false } }).select(
-    '+password',
-  );
-
-  //3. Check if password match
-  const correct = await user?.checkPassword(password, user.password);
-
-  if (!user || !correct) {
-    throw new AppError('Incorrect email or password', 401);
-  }
-
-  //4. Sign token
-  sendToken(user, 200, res);
-});
-
-exports.logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 5 * 1000),
-    httpOnly: true,
-    //hhtp only cookie needs to be sent through secure channel only, mandatorily if it is being done cross-site
-    sameSite: 'None',
-    secure: ssl,
-  });
-  res.status(200).json({ status: 'success' });
-};
-
-exports.protect = catchAsync(async (req, res, next) => {
-  //check for jwt
-  const { authorization } = req.headers;
-  let token;
-  if (authorization && authorization.startsWith('Bearer')) {
-    token = authorization.split(' ')[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
-  }
-
-  if (!token) {
-    throw new AppError('Please login to access this route', 401);
-  }
-
-  //veryfiy jwt
-  const decoded = await promisify(jwt.verify)(token, jwtSecret);
-
-  //if valid, check user exist
-  const user = await User.findById(decoded.id);
-
-  if (!user) {
-    throw new AppError('User does not exist', 401);
-  }
-
-  //check for password change after jwt issue
-  if (user.isPasswordChangedAfter(decoded.iat)) {
-    throw new AppError(
-      'Password has been changed recently. Please login again!',
-      401,
-    );
-  }
-
-  //Grant Access
-  req.user = user;
-  next();
-});
-
-exports.isLoggedIn = async (req, res, next) => {
-  if (req.cookies.jwt) {
-    try {
-      // 1) verify token
-      const decoded = await promisify(jwt.verify)(
-        req.cookies.jwt,
-        process.env.JWT_SECRET,
-      );
-
-      // 2) Check if user still exists
-      let currentUser = await User.findById(decoded.id).select('+active');
-      if (!currentUser?.active) currentUser = undefined;
-
-      if (!currentUser) {
-        throw new Error();
-      }
-
-      // 3) Check if user changed password after the token was issued
-      if (currentUser.isPasswordChangedAfter(decoded.iat)) {
-        throw new Error();
-      }
-
-      // THERE IS A LOGGED IN USER
-
-      req.user = currentUser;
-      res.status(200).json({
-        status: 'success',
-        data: {
-          user: currentUser,
-        },
-      });
-    } catch (err) {
-      res.cookie('jwt', 'loggedout', {
-        expires: new Date(Date.now() + 5 * 1000),
-        httpOnly: true,
-        sameSite: 'None',
-        secure: ssl,
-      });
-      res.status(200).json({
-        status: 'success',
-        data: {
-          user: null,
-        },
-      });
-    }
-  } else {
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user: null,
-      },
-    });
-  }
-};
-
-/*
-restrictTo takes the roles and then returns a middleware that will check for those roles.
-So, while mounting we need to call this with the roles, unlike other middlewares where we
-just pass the function.
-*/
 exports.restrictTo =
   (...roles) =>
     (req, res, next) => {
