@@ -6,3 +6,5 @@ temp/*
 drive-credentials.json
 node_modules
 .env
+env
+dbmigrate.js
