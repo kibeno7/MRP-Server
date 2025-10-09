@@ -24,7 +24,6 @@ const getCookieOptions = (req) => {
 const sendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id, user.role);
   const cookieOptions = getCookieOptions(req);
-
   res.cookie('jwt', token, cookieOptions);
 
   user.password = undefined;
@@ -68,7 +67,7 @@ exports.isLoggedIn = async (req, res) => {
       const decoded = await promisify(jwt.verify)(req.cookies.jwt, jwtSecret);
       const currentUser = await User.findById(decoded.id);
 
-      if (!currentUser || !currentUser.active || currentUser.isPasswordChangedAfter(decoded.iat)) {
+      if (!currentUser) {
         return res.status(200).json({ status: 'fail', data: { user: null } });
       }
       return res.status(200).json({ status: 'success', data: { user: currentUser } });
